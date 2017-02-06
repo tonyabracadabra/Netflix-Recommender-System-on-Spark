@@ -30,3 +30,33 @@ def find_best_rank(training_RDD, ranks):
     print 'The rank of the best model is %s' % best_rank
 
     return best_rank
+
+
+
+def predict_ratings(self, user_and_movie_RDD):
+    """Gets predictions for a given (userID, movieID) formatted RDD
+    Returns: an RDD with format (movieTitle, movieRating, numRatings)
+    """
+    predicted_RDD = self.model.predictAll(user_and_movie_RDD)
+    predicted_rating_RDD = predicted_RDD.map(lambda x: (x.product, x.rating))
+    
+    predicted_rating_title_and_count_RDD = \
+        predicted_rating_RDD.join(self.movies_titles_RDD).join(self.movies_rating_counts_RDD)
+    predicted_rating_title_and_count_RDD = \
+        predicted_rating_title_and_count_RDD.map(lambda r: (r[1][0][1], r[1][0][0], r[1][1]))
+    
+    return predicted_rating_title_and_count_RDD
+    
+def add_ratings(self, ratings):
+    """Add additional movie ratings in the format (user_id, movie_id, rating)
+    """
+    # Convert ratings to an RDD
+    new_ratings_RDD = self.sc.parallelize(ratings)
+    # Add new ratings to the existing ones
+    self.ratings_RDD = self.ratings_RDD.union(new_ratings_RDD)
+    # Re-compute movie ratings count
+    self.__count_and_average_ratings()
+    # Re-train the ALS model with the new ratings
+    self.__train_model()
+    
+    return ratings
