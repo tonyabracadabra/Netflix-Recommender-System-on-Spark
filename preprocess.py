@@ -3,12 +3,6 @@ import urllib
 from pyspark import SparkContext, SparkConf
 
 
-complete_dataset_url = 'http://files.grouplens.org/datasets/movielens/ml-latest.zip'
-small_dataset_url = 'http://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
-
-datasets_path = os.path.join('..', 'datasets')
-
-
 def init_spark_context():
     # load spark context
     conf = SparkConf().setAppName("movielens_movie_recommendation")
